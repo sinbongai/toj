@@ -1,0 +1,1 @@
+COPY TalmageOverride.db "%APPDATA%\FHL TaigiIME\IMTalmage\"

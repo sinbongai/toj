@@ -1,9 +1,20 @@
 import argparse
+import csv
 from datetime import datetime
+import functools
 import re
 import sqlite3
+import string
 import time
 import unicodedata
+
+CSV_COL_ID = "ID"
+CSV_COL_ORIG = "GOÂN-IÚ"
+CSV_COL_NEW = "SIN PÁN"
+CSV_COL_HAN = "HÀNJĪ"
+CSV_COL_NOTE = "CHÙKÁI"
+MARKED_DELETE = "刪除"
+STRIP = string.punctuation + " "
 
 TONE_SUBS = {
     '2': '\u0301',
@@ -67,9 +78,8 @@ def rocascii_to_poj(text):
     return unicodedata.normalize('NFC', text)
 
 def get_row_toj(row):
-    orig = row[1]
-    new = row[2]
-    han = row[3]
+    orig = row[CSV_COL_ORIG]
+    new = row[CSV_COL_NEW]
 
     toj = ''
     i = 0
@@ -78,14 +88,17 @@ def get_row_toj(row):
         j = i + len(orig_chat)
         new_chat = new[i:j]
         if orig_chat == new_chat:
-            if new_chat == '':
-                print('empty')
             toj += rocascii_to_poj(new_chat)
             i += len(orig_chat)
             while i < len(new) and re.match(r'\W', new[i]):
                 toj += new[i]
                 i += 1
     return toj
+
+def skip_row(row):
+    return row[CSV_COL_ORIG].strip(STRIP) == '' \
+        or row[CSV_COL_NEW].strip(STRIP) == '' \
+        or row[CSV_COL_NOTE].find(MARKED_DELETE) > -1
 
 def alpha_only(reading):
     return ''.join(ch for ch in reading if ch.isalpha())
@@ -150,6 +163,9 @@ def build_db(file, word_list, qstring_list):
     c.executemany('INSERT INTO words VALUES (?, ?, ?, ?)', words_table)
     c.executemany('INSERT INTO qstring_word_mappings VALUES (?, ?)', qstrings_table)
     con.commit()
+    con.execute('VACUUM')
+    con.close()
+
 
 ##############################################################################
 #
@@ -161,19 +177,35 @@ parser = argparse.ArgumentParser(
     description="""Build FHL Database""",
     formatter_class=argparse.RawDescriptionHelpFormatter)
 
-parser.add_argument('-i', "--input", metavar='FILE', required=False, help='csv input file')
+parser.add_argument('-i', "--input", metavar='FILE', required=True, help='csv input file')
 parser.add_argument('-o', "--output", metavar='FILE', required=False, help='the output database file (TalmageOverride.db)')
 
 def read_csv(filename):
-    import csv
+    ret = []
     with open(filename) as csvfile:
-        reader = csv.reader(csvfile, delimiter='\t')
-        return [row for row in reader]
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if skip_row(row):
+                continue
+            row[CSV_COL_ORIG] = row[CSV_COL_ORIG].strip(STRIP)
+            row[CSV_COL_NEW] = row[CSV_COL_NEW].strip(STRIP)
+            row[CSV_COL_HAN] = row[CSV_COL_HAN].strip(STRIP)
+
+            # One-offs...
+            if row[CSV_COL_ORIG] == '2-Jun':
+                row[CSV_COL_ORIG] = 'jun2'
+                row[CSV_COL_NEW] = 'jun2'
+            if row[CSV_COL_ORIG] == '7-Jun':
+                row[CSV_COL_ORIG] = 'jun7'
+                row[CSV_COL_NEW] = 'jun7'
+
+            ret.append(row)
+    return ret
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    input_file = args.input if args.input else 'db2.csv'
-    output_file = args.output if args.output else 'TalmageOverride.db'
+    input_file = args.input if args.input else 'data/db.csv'
+    output_file = args.output if args.output else 'data/TalmageOverride.db'
 
     word_list = []
     qstring_list = []
@@ -187,28 +219,29 @@ if __name__ == '__main__':
         toj = get_row_toj(row)
         word_list.append({
             'id': id,
-            'reading': row[1],
+            'reading': row[CSV_COL_ORIG].lower(),
             'value': toj,
         })
-        qstrings = get_qstrings(row[1])
+        qstrings = get_qstrings(row[CSV_COL_ORIG])
         for qstr in qstrings:
             qstring_list.append({
                 'qstring': qstr,
                 'word_id': id
             })
         id += 1
-        word_list.append({
-            'id': id,
-            'reading': row[1],
-            'value': row[3],
-        })
-        for qstr in qstrings:
-            qstring_list.append({
-                'qstring': qstr,
-                'word_id': id
+
+        if row[CSV_COL_HAN]:
+            word_list.append({
+                'id': id,
+                'reading': row[CSV_COL_ORIG].lower(),
+                'value': row[CSV_COL_HAN],
             })
-        id += 1
+            for qstr in qstrings:
+                qstring_list.append({
+                    'qstring': qstr,
+                    'word_id': id
+                })
+            id += 1
 
     qstring_list = sorted(qstring_list, key=lambda x: x['qstring'])
-
     build_db(output_file, word_list, qstring_list)
