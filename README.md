@@ -1,10 +1,14 @@
 # Sìn Bōng Ài + Tâioânjī
 
-**Iáu bô hoattō͘ tángló͘, bo̍kchiân teh siá soatbêngsu niâ!!!!!**
-
-v0.0.0-alpha1
-
 Che sī chi̍t ê khah sin ê [FHL Taigi-Hakka IME 信望愛台語客語輸入法](https://taigi.fhl.net/TaigiIME/) chuliāukhò͘. Chuliāukhò͘ ū hoattō͘ ti̍tchiap phah Tâioânjī, koh ū siukái kài chē Hànjī ê chhògō͘.
+
+**Chòe sin pánpún: [FHL_Taioanji-v0.0.0-alpha1.zip](https://github.com/aiongg/fhl-toj/releases/download/v0.0.0-alpha1/FHL_Taioanji-v0.0.0-alpha1.zip)**
+
+Kòekhì ê pánpún:
+
+- n/a
+
+---
 
 ## Tâioânjī
 
@@ -14,7 +18,7 @@ Che sī chi̍t ê khah sin ê [FHL Taigi-Hakka IME 信望愛台語客語輸入�
 
 ### Chng (Install)
 
-**1** Tángló͘ siōng sin ê `FHL_Taioanji.zip` (*iáu bô bāngliān*).
+**1** Tángló͘ siōng sin ê `FHL_Taioanji-vX.Y.Z.zip`.
 
 **2.** Chhi̍h `Extract`:
 
