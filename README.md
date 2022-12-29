@@ -2,7 +2,7 @@
 
 **Iáu bô hoattō͘ tángló͘, bo̍kchiân teh siá soatbêngsu niâ!!!!!**
 
-v0-alpha
+v0.0.0-alpha1
 
 Che sī chi̍t ê khah sin ê [FHL Taigi-Hakka IME 信望愛台語客語輸入法](https://taigi.fhl.net/TaigiIME/) chuliāukhò͘. Chuliāukhò͘ ū hoattō͘ ti̍tchiap phah Tâioânjī, koh ū siukái kài chē Hànjī ê chhògō͘.
 
