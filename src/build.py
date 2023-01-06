@@ -84,7 +84,7 @@ def get_row_toj(row):
     toj = ''
     i = 0
 
-    for orig_chat in re.split(r'-+', orig):
+    for orig_chat in re.split(r'[ -]+', orig):
         j = i + len(orig_chat)
         new_chat = new[i:j]
         if orig_chat == new_chat:
