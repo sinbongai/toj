@@ -9,12 +9,13 @@ import time
 import unicodedata
 
 CSV_COL_ID = "ID"
-CSV_COL_ORIG = "GOÂN-IÚ"
+CSV_COL_ORIG = "GOÂNIÚ"
 CSV_COL_NEW = "SIN PÁN"
 CSV_COL_HAN = "HÀNJĪ"
 CSV_COL_NOTE = "CHÙKÁI"
 MARKED_DELETE = "刪除"
 STRIP = string.punctuation + " "
+LEGAL_INPUT = r"^[A-Za-z0-9 '-]+$"
 
 TONE_SUBS = {
     '2': '\u0301',
@@ -33,6 +34,13 @@ ROC_SUBS = [
     (r'ing', 'eng'),
     (r'ik', 'ek'),
     (r'nn', '\u207F'),
+    (r'Ts', 'Ch'),
+    (r'Ua', 'Oa'),
+    (r'Ue', 'Oe'),
+    (r'Oo', 'O\u0358'),
+    (r'Ing', 'Eng'),
+    (r'Ik', 'Ek'),
+    (r'nn', '\u207F'),
 ]
 
 ROC_SUBS_ASCII = [
@@ -42,6 +50,12 @@ ROC_SUBS_ASCII = [
     (r'oo', 'ou'),
     (r'ing', 'eng'),
     (r'ik', 'ek'),
+    (r'Ts', 'Ch'),
+    (r'Ua', 'Oa'),
+    (r'Ue', 'Oe'),
+    (r'Oo', 'Ou'),
+    (r'Ing', 'Eng'),
+    (r'Ik', 'Ek'),
 ]
 
 def get_cursor(file):
@@ -55,7 +69,7 @@ def tone_index(text):
     if match is not None:
         return match.start() + 2
     else:
-        for v in ['o', 'a', 'e', 'u', 'i', 'n', 'm']:
+        for v in ['o', 'O', 'a', 'A', 'e', 'E', 'u', 'U', 'i', 'I', 'n', 'N', 'm', 'M']:
             index = text.find(v)
             if index > -1:
                 return index + 1
@@ -84,10 +98,13 @@ def get_row_toj(row):
     toj = ''
     i = 0
 
+    # if orig == 'si7-m7-si7':
+    #     print('ok')
+
     for orig_chat in re.split(r'[ -]+', orig):
         j = i + len(orig_chat)
         new_chat = new[i:j]
-        if orig_chat == new_chat:
+        if orig_chat.lower() == new_chat.lower():
             toj += rocascii_to_poj(new_chat)
             i += len(orig_chat)
             while i < len(new) and re.match(r'\W', new[i]):
@@ -153,9 +170,18 @@ def build_db(file, word_list, qstring_list):
     words_table = []
     qstrings_table = []
 
+    has_error = False
+
     for row in word_list:
+        if row['value'] == '':
+            print(f'Error in row {row["reading"]}')
+            has_error = True
         words_table.append((row['id'], row['reading'], row['value'], 1))
     
+    if has_error:
+        print("Please correct errors in database.")
+        quit()
+
     for row in qstring_list:
         qstrings_table.append((row['qstring'], row['word_id']))
 
@@ -176,9 +202,6 @@ def build_db(file, word_list, qstring_list):
 parser = argparse.ArgumentParser(
     description="""Build FHL Database""",
     formatter_class=argparse.RawDescriptionHelpFormatter)
-
-parser.add_argument('-i', "--input", metavar='FILE', required=True, help='csv input file')
-parser.add_argument('-o', "--output", metavar='FILE', required=False, help='the output database file (TalmageOverride.db)')
 
 def read_csv(filename):
     ret = []
@@ -202,8 +225,23 @@ def read_csv(filename):
             ret.append(row)
     return ret
 
-if __name__ == '__main__':
-    args = parser.parse_args()
+def check_parse_error(row):
+    id = row[CSV_COL_ID]
+    orig = row[CSV_COL_ORIG]
+    toj = row[CSV_COL_NEW]
+
+    parse_error = False
+
+    if not re.match(LEGAL_INPUT, orig):
+        print(f"Chhògō͘ ID: {id}, GOÂNIÚ: {orig}")
+        parse_error = True
+    if not re.match(LEGAL_INPUT, toj):
+        print(f"Chhògō͘ ID: {id}, TOJ: {toj}")
+        parse_error = True
+
+    return parse_error
+
+def main(args):
     input_file = args.input if args.input else 'data/db.csv'
     output_file = args.output if args.output else 'data/TalmageOverride.db'
 
@@ -211,11 +249,15 @@ if __name__ == '__main__':
     qstring_list = []
 
     id = 1
-
     inputs = read_csv(input_file)
+    parse_error = False
     for row in inputs:
         if not row:
             continue
+        parse_error = check_parse_error(row)
+        if parse_error:
+            continue
+
         toj = get_row_toj(row)
         word_list.append({
             'id': id,
@@ -243,5 +285,18 @@ if __name__ == '__main__':
                 })
             id += 1
 
+    if parse_error:
+        print("Please fix errors and try again.")
+        quit()
+
     qstring_list = sorted(qstring_list, key=lambda x: x['qstring'])
     build_db(output_file, word_list, qstring_list)
+
+### entry point ###
+
+parser.add_argument('-i', "--input", metavar='FILE', required=True, help='csv input file')
+parser.add_argument('-o', "--output", metavar='FILE', required=False, help='the output database file (TalmageOverride.db)')
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+    main(args)

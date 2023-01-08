@@ -4,11 +4,11 @@
 
 這是一个 khah 新 ê [FHL Taigi-Hakka IME 信望愛台語客語輸入法](https://taigi.fhl.net/TaigiIME/)資料庫。資料庫有法度直接phahTOJ=無連字符ê白話字，koh有修改kài chē 漢字、白話字 ê 錯誤。
 
-**最新版本: [FHL_Taioanji-v0.0.0-alpha1.zip](https://github.com/aiongg/fhl-toj/releases/download/v0.0.0-alpha1/FHL_Taioanji-v0.0.0-alpha1.zip)**
+**最新版本 (2023-01-08): [FHL_Taioanji-v0.0.1.zip](https://github.com/aiongg/fhl-toj/releases/download/v0.0.1/FHL_Taioanji-v0.0.1.zip)**
 
 過去 ê 版本:
 
-- 無
+- 最新版本: [FHL_Taioanji-v0.0.0-alpha1.zip](https://github.com/aiongg/fhl-toj/releases/download/v0.0.0-alpha1/FHL_Taioanji-v0.0.0-alpha1.zip)
 
 ---
 
@@ -23,10 +23,10 @@
 註：
 
 - 你 ê 電腦需要有安裝[信望愛台語客語輸入法](https://taigi.fhl.net/TaigiIME/)。
-- 若頭一改 beh 安裝台灣字資料庫，免重開電腦。
+- 若頭一 kái beh 安裝台灣字資料庫，免重開電腦。
 - 若 beh 更新，請先重開電腦。
 
-**1** Tángló͘ 上新 ê `FHL_Taioanji-vX.Y.Z.zip`.
+**1.** Tángló͘ siōng 新 ê `FHL_Taioanji-vX.Y.Z.zip`.
 
 **2.** Chhi̍h `解壓縮 (Extract)`：
 
@@ -48,7 +48,7 @@
 
 <img src="soatbeng/05-install.png" width="50%" height="50%">
 
-Án-ne to̍h ē sái 開始使用。若 iáu 無台灣字，請重新開機，koh 試一 pái。
+Ánne to̍h ē sái 開始使用。若 iáu 無台灣字，請重新開機，koh 試一 pái。
 
 Ūi tio̍h phah 台灣字 khah 利便，輸入法 ê 設定做 1-9 選漢字：
 
