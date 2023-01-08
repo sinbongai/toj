@@ -126,8 +126,9 @@ def get_qstrings(reading):
     roc_alphas = alpha_only(roc_reading)
     poj_alphas = alpha_only(poj_reading)
 
-    syls = re.split(r'-+', roc_reading)
-    n_syls = len(syls)
+    roc_syls = re.split(r'-+', roc_reading)
+    poj_syls = re.split(r'-+', poj_reading)
+    n_syls = len(roc_syls)
 
     if n_syls == 1:
         return [poj_reading] if poj_reading == roc_reading else [poj_reading, roc_reading]
@@ -136,11 +137,15 @@ def get_qstrings(reading):
     else:
         roc_initials = ''
         poj_initials = ''
-        for syl in syls:
-            m = re.match(r'tsh?|[ptk]h', syl, re.IGNORECASE)
-            init = syl[m.start():m.end()] if m is not None else syl[0]
-            roc_initials += init
-            poj_initials += init.replace('ts', 'ch')
+        for roc_syl, poj_syl in zip(roc_syls, poj_syls):
+            roc_init = roc_syl[0]
+            poj_init = poj_syl[0]
+            m = re.match(r'tsh?|[ptk]h', roc_syl, re.IGNORECASE)
+            if m is not None:
+                roc_init = roc_syl[m.start():m.end()]
+                poj_init = poj_syl[m.start():m.end()]
+            roc_initials += roc_init
+            poj_initials += poj_init
         if poj_initials == roc_initials and poj_alphas == roc_alphas:
             return [poj_initials, poj_alphas]
         elif poj_initials == roc_initials and poj_alphas != roc_alphas:
@@ -264,6 +269,10 @@ def main(args):
             'reading': row[CSV_COL_ORIG].lower(),
             'value': toj,
         })
+
+        # if row[CSV_COL_ORIG] == 'tai5-uan5-ue7-bun5':
+        #     print('ok')
+
         qstrings = get_qstrings(row[CSV_COL_ORIG])
         for qstr in qstrings:
             qstring_list.append({

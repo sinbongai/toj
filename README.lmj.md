@@ -4,11 +4,9 @@
 
 Che sī chi̍t ê khah sin ê [FHL Taigi-Hakka IME 信望愛台語客語輸入法](https://taigi.fhl.net/TaigiIME/) chuliāukhò͘. Chuliāukhò͘ ū hoattō͘ ti̍tchiap phah Tâioânjī, koh ū siukái kài chē Hànjī ê chhògō͘.
 
-**Chòe sin pánpún (2023-01-08): [FHL_Taioanji-v0.0.1.zip](https://github.com/aiongg/fhl-toj/releases/download/v0.0.1/FHL_Taioanji-v0.0.1.zip)**
+**Chòe sin pánpún (2023-01-08): [FHL_Taioanji-v0.0.2.zip](https://github.com/aiongg/fhl-toj/releases/download/v0.0.2/FHL_Taioanji-v0.0.2.zip)**
 
-Kòekhì ê pánpún:
-
-- Chòe sin pánpún: [FHL_Taioanji-v0.0.0-alpha1.zip](https://github.com/aiongg/fhl-toj/releases/download/v0.0.0-alpha1/FHL_Taioanji-v0.0.0-alpha1.zip)
+Kòekhì ê pánpún, chhiáⁿ khòaⁿ [`releases`](https://github.com/aiongg/fhl-toj/releases).
 
 ---
 
