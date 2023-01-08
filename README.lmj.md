@@ -12,7 +12,7 @@ Kòekhì ê pánpún, chhiáⁿ khòaⁿ [`releases`](https://github.com/aiongg/
 
 ## Tâioânjī
 
-Tâioânjī (TOJ) sī bô liânjīhû ê Pe̍hōejī.
+Tâioânjī (TOJ) sī bô liânjīhû ê Pe̍hōejī. Hoangêng lâi [Choânbîn Tâioânjī Tâibûn Siā](https://www.facebook.com/groups/3890458310987344) thólūn.
 
 ## Windows
 
