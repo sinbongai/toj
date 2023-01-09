@@ -1,7 +1,6 @@
 import argparse
 import csv
 from datetime import datetime
-import functools
 import re
 import sqlite3
 import string
@@ -33,7 +32,6 @@ ROC_SUBS = [
     (r'oo', 'o\u0358'),
     (r'ing', 'eng'),
     (r'ik', 'ek'),
-    (r'nn', '\u207F'),
     (r'Ts', 'Ch'),
     (r'Ua', 'Oa'),
     (r'Ue', 'Oe'),
@@ -113,8 +111,8 @@ def get_row_toj(row):
     toj = ''
     i = 0
 
-    # if orig == 'si7-m7-si7':
-    #     print('ok')
+    if orig == 'nng2-lang5':
+        print('ok')
 
     for orig_chat in re.split(r'[ -]+', orig):
         j = i + len(orig_chat)
@@ -212,17 +210,6 @@ def build_db(file, word_list, qstring_list):
     con.execute('VACUUM')
     con.close()
 
-
-##############################################################################
-#
-# __main__
-#
-##############################################################################
-
-parser = argparse.ArgumentParser(
-    description="""Build FHL Database""",
-    formatter_class=argparse.RawDescriptionHelpFormatter)
-
 def read_csv(filename):
     ret = []
     with open(filename) as csvfile:
@@ -261,9 +248,31 @@ def check_parse_error(row):
 
     return parse_error
 
+def find_missing_words(inputs, qstring_map, outfile):
+    qstring_list = [x['qstring'] for x in qstring_map]
+    missing_words = []
+
+    for row in inputs:
+        toj = row[CSV_COL_NEW]
+        words = toj.split(' ')
+        if len(words) == 1:
+            continue
+        for word in words:
+            word = word.lower()
+            index1 = binary_search(qstring_list, word)
+            index2 = binary_search(qstring_list, re.sub(r"[0-9']", '', word))
+            if index1 >= 0 or index2 >= 0:
+                continue
+            missing_words.append(toj + '\t' + word)
+
+    with open(outfile, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(missing_words))
+
 def main(args):
+    now = time.strftime('%Y%m%d%H%M%S')
+    print(now)
     input_file = args.input if args.input else 'data/db.csv'
-    output_file = args.output if args.output else 'data/TalmageOverride.db'
+    output_file = args.output if args.output else f'data/TalmageOverride-{now}.db'
 
     word_list = []
     qstring_list = []
@@ -285,15 +294,12 @@ def main(args):
             'value': toj,
         })
 
-        # if row[CSV_COL_ORIG] == 'tai5-uan5-ue7-bun5':
-        #     print('ok')
+        if row[CSV_COL_ORIG] == 'oo5-kong2':
+            print('ok')
+
 
         qstrings = get_qstrings(row[CSV_COL_ORIG])
-        for qstr in qstrings:
-            qstring_list.append({
-                'qstring': qstr,
-                'word_id': id
-            })
+        qstring_list += [{'qstring': q, 'word_id': id} for q in qstrings]
         id += 1
 
         if row[CSV_COL_HAN]:
@@ -302,11 +308,7 @@ def main(args):
                 'reading': row[CSV_COL_ORIG].lower(),
                 'value': row[CSV_COL_HAN],
             })
-            for qstr in qstrings:
-                qstring_list.append({
-                    'qstring': qstr,
-                    'word_id': id
-                })
+            qstring_list += [{'qstring': q, 'word_id': id} for q in qstrings]
             id += 1
 
     if parse_error:
@@ -314,28 +316,20 @@ def main(args):
         quit()
 
     qstring_map = sorted(qstring_list, key=lambda x: x['qstring'])
-    qstring_list = [x['qstring'] for x in qstring_map]
 
-    missing_words = []
-
-    for row in inputs:
-        toj = row[CSV_COL_NEW]
-        words = toj.split(' ')
-        if len(words) == 1:
-            continue
-        for word in words:
-            word = word.lower()
-            index1 = binary_search(qstring_list, word)
-            index2 = binary_search(qstring_list, re.sub(r"[0-9']", '', word))
-            if index1 >= 0 or index2 >= 0:
-                continue
-            missing_words.append(toj + '\t' + word)
-    with open('missing_words.txt', 'w', encoding='utf-8') as f:
-        f.write('\n'.join(missing_words))
+    # find_missing_words(inputs, qstring_map, 'missing-words.txt')
 
     build_db(output_file, word_list, qstring_map)
 
-### entry point ###
+##############################################################################
+#
+# __main__
+#
+##############################################################################
+
+parser = argparse.ArgumentParser(
+    description="""Build FHL Database""",
+    formatter_class=argparse.RawDescriptionHelpFormatter)
 
 parser.add_argument('-i', "--input", metavar='FILE', required=True, help='csv input file')
 parser.add_argument('-o', "--output", metavar='FILE', required=False, help='the output database file (TalmageOverride.db)')
