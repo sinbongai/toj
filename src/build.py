@@ -40,7 +40,7 @@ ROC_SUBS = [
     (r'Oo', 'O\u0358'),
     (r'Ing', 'Eng'),
     (r'Ik', 'Ek'),
-    (r'nn', '\u207F'),
+    (r'nn\d?$', '\u207F'),
 ]
 
 ROC_SUBS_ASCII = [
@@ -63,6 +63,21 @@ def get_cursor(file):
     con.row_factory = sqlite3.Row
     cur = con.cursor()
     return cur
+
+def binary_search(arr, x):
+    low = 0
+    high = len(arr) - 1
+    mid = 0
+ 
+    while low <= high:
+        mid = (high + low) // 2
+        if arr[mid] < x:
+            low = mid + 1
+        elif arr[mid] > x:
+            high = mid - 1
+        else:
+            return mid
+    return -1
 
 def tone_index(text):
     match = re.match(r'o[ae][a-z]', text, re.I)
@@ -140,7 +155,7 @@ def get_qstrings(reading):
         for roc_syl, poj_syl in zip(roc_syls, poj_syls):
             roc_init = roc_syl[0]
             poj_init = poj_syl[0]
-            m = re.match(r'tsh?|[ptk]h', roc_syl, re.IGNORECASE)
+            m = re.match(r'tsh?|[ptk]h|ng', roc_syl, re.IGNORECASE)
             if m is not None:
                 roc_init = roc_syl[m.start():m.end()]
                 poj_init = poj_syl[m.start():m.end()]
@@ -298,8 +313,27 @@ def main(args):
         print("Please fix errors and try again.")
         quit()
 
-    qstring_list = sorted(qstring_list, key=lambda x: x['qstring'])
-    build_db(output_file, word_list, qstring_list)
+    qstring_map = sorted(qstring_list, key=lambda x: x['qstring'])
+    qstring_list = [x['qstring'] for x in qstring_map]
+
+    missing_words = []
+
+    for row in inputs:
+        toj = row[CSV_COL_NEW]
+        words = toj.split(' ')
+        if len(words) == 1:
+            continue
+        for word in words:
+            word = word.lower()
+            index1 = binary_search(qstring_list, word)
+            index2 = binary_search(qstring_list, re.sub(r"[0-9']", '', word))
+            if index1 >= 0 or index2 >= 0:
+                continue
+            missing_words.append(toj + '\t' + word)
+    with open('missing_words.txt', 'w', encoding='utf-8') as f:
+        f.write('\n'.join(missing_words))
+
+    build_db(output_file, word_list, qstring_map)
 
 ### entry point ###
 
