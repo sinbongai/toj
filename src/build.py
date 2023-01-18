@@ -111,9 +111,6 @@ def get_row_toj(row):
     toj = ''
     i = 0
 
-    if orig == 'nng2-lang5':
-        print('ok')
-
     for orig_chat in re.split(r'[ -]+', orig):
         j = i + len(orig_chat)
         new_chat = new[i:j]
@@ -274,6 +271,8 @@ def main(args):
     input_file = args.input if args.input else 'data/db.csv'
     output_file = args.output if args.output else f'data/TalmageOverride-{now}.db'
 
+    seen_words = set()
+    seen_ji = set()
     word_list = []
     qstring_list = []
 
@@ -281,32 +280,37 @@ def main(args):
     inputs = read_csv(input_file)
     parse_error = False
     for row in inputs:
+        if row[CSV_COL_ORIG] == 'thian-tin-lai5':
+            print('debug')
+
         if not row:
             continue
         parse_error = check_parse_error(row)
         if parse_error:
             continue
 
-        toj = get_row_toj(row)
-        word_list.append({
-            'id': id,
-            'reading': row[CSV_COL_ORIG].lower(),
-            'value': toj,
-        })
-
-        if row[CSV_COL_ORIG] == 'oo5-kong2':
-            print('ok')
-
-
+        reading = row[CSV_COL_ORIG].lower()
+        value = get_row_toj(row)
+        ji_value = row[CSV_COL_HAN]
         qstrings = get_qstrings(row[CSV_COL_ORIG])
-        qstring_list += [{'qstring': q, 'word_id': id} for q in qstrings]
-        id += 1
 
-        if row[CSV_COL_HAN]:
+        if (reading, value) not in seen_words:
+            seen_words.add((reading, value))
             word_list.append({
                 'id': id,
-                'reading': row[CSV_COL_ORIG].lower(),
-                'value': row[CSV_COL_HAN],
+                'reading': reading,
+                'value': value,
+            })
+
+            qstring_list += [{'qstring': q, 'word_id': id} for q in qstrings]
+            id += 1
+
+        if ji_value and (reading, ji_value) not in seen_ji:
+            seen_ji.add((reading, ji_value))
+            word_list.append({
+                'id': id,
+                'reading': reading,
+                'value': ji_value,
             })
             qstring_list += [{'qstring': q, 'word_id': id} for q in qstrings]
             id += 1
