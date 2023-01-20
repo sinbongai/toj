@@ -38,7 +38,7 @@ ROC_SUBS = [
     (r'Oo', 'O\u0358'),
     (r'Ing', 'Eng'),
     (r'Ik', 'Ek'),
-    (r'nn\d?$', '\u207F'),
+    (r'nn', '\u207F'),
 ]
 
 ROC_SUBS_ASCII = [
@@ -78,7 +78,7 @@ def binary_search(arr, x):
     return -1
 
 def tone_index(text):
-    match = re.match(r'o[ae][a-z]', text, re.I)
+    match = re.search(r'o[ae][a-z]', text, re.I)
     if match is not None:
         return match.start() + 2
     else:
@@ -280,7 +280,7 @@ def main(args):
     inputs = read_csv(input_file)
     parse_error = False
     for row in inputs:
-        if row[CSV_COL_ORIG] == 'thian-tin-lai5':
+        if row[CSV_COL_ORIG] == 'huih-suainn7':
             print('debug')
 
         if not row:

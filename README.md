@@ -4,7 +4,7 @@
 
 這是一个 khah 新 ê [FHL Taigi-Hakka IME 信望愛台語客語輸入法](https://taigi.fhl.net/TaigiIME/)資料庫。資料庫有法度直接phahTOJ=無連字符ê白話字，koh有修改kài chē 漢字、白話字 ê 錯誤。
 
-**最新版本 (2023-01-18): [FHL_Taioanji-v0.0.4.zip](https://github.com/sinbongai/toj/releases/download/v0.0.4/FHL_Taioanji-v0.0.4.zip)**
+**最新版本 (2023-01-18): [FHL_Taioanji-v0.0.5.zip](https://github.com/sinbongai/toj/releases/download/v0.0.5/FHL_Taioanji-v0.0.5.zip)**
 
 過去 ê 版本，請看 [`releases`](https://github.com/sinbongai/toj/releases)。
 
