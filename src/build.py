@@ -38,7 +38,7 @@ ROC_SUBS = [
     (r'Oo', 'O\u0358'),
     (r'Ing', 'Eng'),
     (r'Ik', 'Ek'),
-    (r'nn', '\u207F'),
+    (r'nn(\d?)$', r'ⁿ\1'),
 ]
 
 ROC_SUBS_ASCII = [
@@ -81,11 +81,14 @@ def tone_index(text):
     match = re.search(r'o[ae][a-z]', text, re.I)
     if match is not None:
         return match.start() + 2
-    else:
-        for v in ['o', 'O', 'a', 'A', 'e', 'E', 'u', 'U', 'i', 'I', 'n', 'N', 'm', 'M']:
-            index = text.find(v)
-            if index > -1:
-                return index + 1
+
+    if re.match(r'nn', text, re.I):
+        return 2
+
+    for v in ['o', 'O', 'a', 'A', 'e', 'E', 'u', 'U', 'i', 'I', 'n', 'N', 'm', 'M']:
+        index = text.find(v)
+        if index > -1:
+            return index + 1
 
 def rojascii_to_pojascii(text):
     for sub in ROC_SUBS_ASCII:
@@ -280,7 +283,7 @@ def main(args):
     inputs = read_csv(input_file)
     parse_error = False
     for row in inputs:
-        if row[CSV_COL_ORIG] == 'huih-suainn7':
+        if row[CSV_COL_ORIG] == 'nng7':
             print('debug')
 
         if not row:
