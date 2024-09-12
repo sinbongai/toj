@@ -10,8 +10,16 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "build.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/build.py",
+            "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["-i", "data/db.csv"]
+            "args": ["-i", "data/db-20240912.csv"]
         }
     ]
 }

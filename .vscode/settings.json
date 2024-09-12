@@ -20,5 +20,6 @@
                 }
             }
         ]
-    }
+    },
+    "python.analysis.typeCheckingMode": "basic"
 }
