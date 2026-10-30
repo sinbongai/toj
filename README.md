@@ -4,7 +4,7 @@
 
 這是一个 khah 新 ê [FHL Taigi-Hakka IME 信望愛台語客語輸入法](https://taigi.fhl.net/TaigiIME/)資料庫。資料庫有法度直接phahTOJ=無連字符ê白話字，koh有修改kài chē 漢字、白話字 ê 錯誤。
 
-**最新版本 (2024-09-12): [FHL_Taioanji-v0.0.8.zip](https://github.com/sinbongai/toj/releases/download/v0.0.8/FHL_Taioanji-v0.0.8.zip)**
+**最新版本 (2026-10-30): [FHL_Taioanji-v0.0.9.zip](https://github.com/sinbongai/toj/releases/download/v0.0.9/FHL_Taioanji-v0.0.9.zip)**
 
 過去 ê 版本，請看 [`releases`](https://github.com/sinbongai/toj/releases)。
 
@@ -115,5 +115,14 @@ There's just a simple build script in `src/build.py`. You will need a CSV file w
 2. original lomaji - fully hyphenated as in the original FHL database
 3. taioanji - with hyphens removed (either joined or spaced) as required
 4. hanji - desired hanji output
+```
 
 Run the script and copy the output SQLite database `TalmageOverride.db` to the appropriate folder for your platform. To uninstall or modify, you must log out and log back in (or reboot) first.
+
+The sheet export usually needs cleaning first. `src/clean.py` applies hand-reviewed fixes from `fixes/` plus safe automatic rules (Unicode normalization, tone-number lomaji in HÀNJĪ → POJ, GOÂNIÚ realigned to corrected SIN PÁN syllables), and writes a log of every change and a list of rows that still need a human:
+
+    python3 src/clean.py -i data/db-YYYYMMDD.csv -f fixes/db-YYYYMMDD.csv \
+        -o data/db-YYYYMMDD-clean.csv -c data/db-YYYYMMDD-changes.csv -r data/db-YYYYMMDD-review.csv
+    python3 src/build.py -i data/db-YYYYMMDD-clean.csv
+
+`build.py` stops on any row whose SIN PÁN doesn't match GOÂNIÚ syllable for syllable. Tests: `cd src && python3 -m unittest test_build`.

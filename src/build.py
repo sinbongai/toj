@@ -14,7 +14,7 @@ CSV_COL_HAN = "HÀNJĪ"
 CSV_COL_NOTE = "CHÙKÁI"
 MARKED_DELETE = "刪除"
 STRIP = string.punctuation + " "
-LEGAL_INPUT = r"^[A-Za-z0-9 '-]+$"
+LEGAL_INPUT = r"^[A-Za-z235789 '-]+$"
 
 TONE_SUBS = {
     '2': '\u0301',
@@ -38,7 +38,7 @@ ROC_SUBS = [
     (r'Oo', 'O\u0358'),
     (r'Ing', 'Eng'),
     (r'Ik', 'Ek'),
-    (r'nn(\d?)$', r'ⁿ\1'),
+    (r'nn(h?\d?)$', r'ⁿ\1'),
 ]
 
 ROC_SUBS_ASCII = [
@@ -117,12 +117,15 @@ def get_row_toj(row):
     for orig_chat in re.split(r'[ -]+', orig):
         j = i + len(orig_chat)
         new_chat = new[i:j]
-        if orig_chat.lower() == new_chat.lower():
-            toj += rocascii_to_poj(new_chat)
-            i += len(orig_chat)
-            while i < len(new) and re.match(r'\W', new[i]):
-                toj += new[i]
-                i += 1
+        if orig_chat.lower() != new_chat.lower():
+            raise ValueError(f'"{new}" does not match "{orig}" at "{orig_chat}"')
+        toj += rocascii_to_poj(new_chat)
+        i += len(orig_chat)
+        while i < len(new) and re.match(r'\W', new[i]):
+            toj += new[i]
+            i += 1
+    if i < len(new):
+        raise ValueError(f'"{new}" has extra text "{new[i:]}" not in "{orig}"')
     return toj
 
 def skip_row(row):
@@ -288,12 +291,17 @@ def main(args):
 
         if not row:
             continue
-        parse_error = check_parse_error(row)
-        if parse_error:
+        if check_parse_error(row):
+            parse_error = True
             continue
 
         reading = row[CSV_COL_ORIG].lower()
-        value = get_row_toj(row)
+        try:
+            value = get_row_toj(row)
+        except ValueError as e:
+            print(f"Chhògō͘ ID: {row[CSV_COL_ID]}, {e}")
+            parse_error = True
+            continue
         ji_value = row[CSV_COL_HAN]
         qstrings = get_qstrings(row[CSV_COL_ORIG])
 
